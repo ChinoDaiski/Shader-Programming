@@ -1,8 +1,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudio,git,c++
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudio,git,c++
 
-!SimpleGame/vs/*
-!SimpleGame/x64/*
+!.SimpleGame/vs/*
+!.SimpleGame/x64/*
+!.SimpleGame/SimpleGame/x64/
 
 ### C++ ###
 # Prerequisites

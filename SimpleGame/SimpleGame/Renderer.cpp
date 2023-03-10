@@ -4,6 +4,7 @@
 Renderer::Renderer(int windowSizeX, int windowSizeY)
 {
 	Initialize(windowSizeX, windowSizeY);
+	Class0310();
 }
 
 
@@ -43,7 +44,7 @@ void Renderer::CreateVertexBufferObjects()
 		-1.f / m_WindowSizeX, -1.f / m_WindowSizeY, 0.f,  1.f / m_WindowSizeX, 1.f / m_WindowSizeY, 0.f, 1.f / m_WindowSizeX, -1.f / m_WindowSizeY, 0.f, //Triangle2
 	};
 
-	glGenBuffers(1, &m_VBORect);
+	glGenBuffers(1, &m_VBORect);	// 1번 생성
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
 }
@@ -182,8 +183,51 @@ void Renderer::DrawSolidRect(float x, float y, float z, float size, float r, flo
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+void Renderer::Class0310_Render()
+{
+	//Program select
+	glUseProgram(m_SolidRectShader);
+
+	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Trans"), 0, 0, 0, 1);
+	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Color"), 1, 1, 1, 1);	// white color
+
+	//int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
+	glEnableVertexAttribArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);		// 3개 씩 읽고, stride는 없다.
+
+	glDrawArrays(GL_TRIANGLES, 0, 3);	 // GL_LINE_STRIP, GL_POINTS 등도 가능하다.
+}
+
 void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)
 {
 	*newX = x * 2.f / m_WindowSizeX;
 	*newY = y * 2.f / m_WindowSizeY;
+}
+
+void Renderer::Class0310()
+{
+	float vertices[] = { 0,0,0, 1,0,0, 1,1,0 };	// CPU memory
+	
+	glGenBuffers(1, &m_testVBO);	// Get Buffer Object ID, 2번 생성
+	glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);	// bind tp array buffer
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);	// Data transfer to GPU
+	// GL_STATIC_DRAW : GPU에 올릴 데이터는 바꿀 수 없는 상수(static)로 사용할 것이다.
+	// STATIC으로 선언한 데이터	: CPU 쪽에선 데이터를 GPU에 올리고 나선 더이상 값을 저장하지 않는다.
+	// DYNAMIC으로 선언한 데이터	: CPU한 쪽에 데이터를 저장하는 공간을 만들어서 보내고, GPU에 값을 올린다.
+	//							  OpenGL에선 해당 값이 바뀌거나 값이 바뀌는것을 감지하는 함수를 만들어서 데이터가 바뀔시 GPU에 데이터를 올린다.
+
+	// DYNAMIC은 주로 물리 연산에 필요한 데이터들을 처리할 때 사용했다.
+
+	//float* temp;
+	//int size = 400000000;
+	//temp = new float[size];
+
+	//memset(temp, 1, sizeof(float)* size);
+
+	//glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);	// bind tp array buffer
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * size, temp, GL_STATIC_DRAW);	// Data transfer to GPU
+	//std::cout << "asdf" << std::endl;
+
+	
 }
