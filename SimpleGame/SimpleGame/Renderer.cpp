@@ -183,8 +183,12 @@ void Renderer::DrawSolidRect(float x, float y, float z, float size, float r, flo
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
+float g_time = 0.f;
+
 void Renderer::Class0310_Render()
 {
+	// 렌더링하는 부분
+
 	//Program select
 	glUseProgram(m_SolidRectShader);
 
@@ -192,11 +196,41 @@ void Renderer::Class0310_Render()
 	glUniform4f(glGetUniformLocation(m_SolidRectShader, "u_Color"), 1, 1, 1, 1);	// white color
 
 	//int attribPosition = glGetAttribLocation(m_SolidRectShader, "a_Position");
-	glEnableVertexAttribArray(0);
+
+#pragma region using_layout_in_SolidRect.vs
+	//glEnableVertexAttribArray(0);	// SolidRect.vs에서 layout = 0을 해주었기 때문에 해당 값은 안전하다.
+	//								// 아니면 변수 이름을 통해 해당 숫자 값을 알 수도 있다.
+	//glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);
+	//glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);		// 3개 씩 읽고, stride는 없다.
+#pragma endregion
+
+#pragma region no_layout_in_SolidRect.vs
+	int attribLoc_Position = -1;
+	attribLoc_Position = glGetAttribLocation(m_SolidRectShader, "a_Position");
+	glEnableVertexAttribArray(attribLoc_Position);
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);		// 3개 씩 읽고, stride는 없다.
+	glVertexAttribPointer(attribLoc_Position, 3, GL_FLOAT, GL_FALSE, 0, 0);		// 3개 씩 읽고, stride는 없다.
+#pragma endregion
+
+	
+	glEnableVertexAttribArray(1);	// 어트리뷰트 활성화
+	glBindBuffer(GL_ARRAY_BUFFER, m_testVBO1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+
+
+#pragma region uniform_variable_in_SolidRect.vs
+	int uniformLoc_Scale = -1;
+	uniformLoc_Scale = glGetUniformLocation(m_SolidRectShader, "u_Scale");
+	glUniform1f(uniformLoc_Scale, g_time);	// 1f : 1개, float 형식 이라는 뜻
+	g_time += 0.016f;
+	if (g_time > 1.f)
+		g_time = 0.f;
+#pragma endregion
+
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);	 // GL_LINE_STRIP, GL_POINTS 등도 가능하다.
+
 }
 
 void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)
@@ -207,11 +241,23 @@ void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)
 
 void Renderer::Class0310()
 {
+	// 데이터를 준비하는 부분
+
 	float vertices[] = { 0,0,0, 1,0,0, 1,1,0 };	// CPU memory
 	
 	glGenBuffers(1, &m_testVBO);	// Get Buffer Object ID, 2번 생성
 	glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);	// bind tp array buffer
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);	// Data transfer to GPU
+
+	
+	float vertices1[] = { -1,-1,0, 0,-1,0, 0,0,0 };	// CPU memory
+
+	glGenBuffers(1, &m_testVBO1);	// Get Buffer Object ID, 2번 생성
+	glBindBuffer(GL_ARRAY_BUFFER, m_testVBO1);	// bind tp array buffer
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);	// Data transfer to GPU
+
+
+
 	// GL_STATIC_DRAW : GPU에 올릴 데이터는 바꿀 수 없는 상수(static)로 사용할 것이다.
 	// STATIC으로 선언한 데이터	: CPU 쪽에선 데이터를 GPU에 올리고 나선 더이상 값을 저장하지 않는다.
 	// DYNAMIC으로 선언한 데이터	: CPU한 쪽에 데이터를 저장하는 공간을 만들어서 보내고, GPU에 값을 올린다.
@@ -219,6 +265,7 @@ void Renderer::Class0310()
 
 	// DYNAMIC은 주로 물리 연산에 필요한 데이터들을 처리할 때 사용했다.
 
+	// GPU에 데이터를 올리는 시간을 측정하는 구간, 여기에 chrono를 사용하여 시간을 측정하면 초당 GPU에 올라가는 데이터의 양을 알 수 있다. 
 	//float* temp;
 	//int size = 400000000;
 	//temp = new float[size];
@@ -229,5 +276,4 @@ void Renderer::Class0310()
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * size, temp, GL_STATIC_DRAW);	// Data transfer to GPU
 	//std::cout << "asdf" << std::endl;
 
-	
 }
