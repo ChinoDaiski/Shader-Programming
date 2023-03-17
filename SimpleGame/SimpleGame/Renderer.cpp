@@ -4,7 +4,9 @@
 Renderer::Renderer(int windowSizeX, int windowSizeY)
 {
 	Initialize(windowSizeX, windowSizeY);
-	Class0310();
+	//Class0310();
+
+	CreateParticle();
 }
 
 
@@ -20,6 +22,7 @@ void Renderer::Initialize(int windowSizeX, int windowSizeY)
 
 	//Load shaders
 	m_SolidRectShader = CompileShaders("./Shaders/SolidRect.vs", "./Shaders/SolidRect.fs");
+	m_ParticleShader = CompileShaders("./Shaders/Particle.vs", "./Shaders/Particle.fs");
 	
 	//Create VBOs
 	CreateVertexBufferObjects();
@@ -47,6 +50,33 @@ void Renderer::CreateVertexBufferObjects()
 	glGenBuffers(1, &m_VBORect);	// 1번 생성
 	glBindBuffer(GL_ARRAY_BUFFER, m_VBORect);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(rect), rect, GL_STATIC_DRAW);
+
+
+
+
+
+	// 데이터를 준비하는 부분
+
+	float vertices[] = { 0,0,0, 1,0,0, 1,1,0 };	// CPU memory
+
+	glGenBuffers(1, &m_testVBO);	// Get Buffer Object ID, 2번 생성
+	glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);	// bind tp array buffer
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);	// Data transfer to GPU
+
+
+	float vertices1[] = { -1,-1,0, 0,-1,0, 0,0,0 };	// CPU memory
+
+	glGenBuffers(1, &m_testVBO1);	// Get Buffer Object ID, 2번 생성
+	glBindBuffer(GL_ARRAY_BUFFER, m_testVBO1);	// bind tp array buffer
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);	// Data transfer to GPU
+
+
+
+	float verticesColor[] = { 1,0,0,1, 0,1,0,1, 0,0,1,1 };	// CPU memory
+
+	glGenBuffers(1, &m_testVBOColor);	// Get Buffer Object ID, 2번 생성
+	glBindBuffer(GL_ARRAY_BUFFER, m_testVBOColor);	// bind tp array buffer
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verticesColor), verticesColor, GL_STATIC_DRAW);	// Data transfer to GPU
 }
 
 void Renderer::AddShader(GLuint ShaderProgram, const char* pShaderText, GLenum ShaderType)
@@ -153,7 +183,7 @@ GLuint Renderer::CompileShaders(char* filenameVS, char* filenameFS)
 		return -1;
 	}
 
-	glUseProgram(ShaderProgram);
+	//glUseProgram(ShaderProgram);	// 렌더링 전에 해주면 되는 코드이다. 여기서 할 필요는 없다.
 	std::cout << filenameVS << ", " << filenameFS << " Shader compiling is done.";
 
 	return ShaderProgram;
@@ -213,11 +243,20 @@ void Renderer::Class0310_Render()
 	glVertexAttribPointer(attribLoc_Position, 3, GL_FLOAT, GL_FALSE, 0, 0);		// 3개 씩 읽고, stride는 없다.
 #pragma endregion
 
-	
+#pragma region vs_Color
+	int attribLoc_Color = -1;
+	attribLoc_Color = glGetAttribLocation(m_SolidRectShader, "a_Color");
+	glEnableVertexAttribArray(attribLoc_Color);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_testVBOColor);
+	glVertexAttribPointer(attribLoc_Color, 4, GL_FLOAT, GL_FALSE, 0, 0);		// 4개 씩 읽고, stride는 없다.
+#pragma endregion
+
+#pragma region use_layout
 	glEnableVertexAttribArray(1);	// 어트리뷰트 활성화
 	glBindBuffer(GL_ARRAY_BUFFER, m_testVBO1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
-
+#pragma endregion
 
 #pragma region uniform_variable_in_SolidRect.vs
 	int uniformLoc_Scale = -1;
@@ -225,12 +264,29 @@ void Renderer::Class0310_Render()
 	glUniform1f(uniformLoc_Scale, g_time);	// 1f : 1개, float 형식 이라는 뜻
 	g_time += 0.016f;
 	if (g_time > 1.f)
-		g_time = 0.f;
+		g_time = 1.f;	// 0.f
 #pragma endregion
 
 
 	glDrawArrays(GL_TRIANGLES, 0, 3);	 // GL_LINE_STRIP, GL_POINTS 등도 가능하다.
 
+}
+
+void Renderer::DrawParticleEffect()
+{
+	//Program select
+	int shaderProgram = m_ParticleShader;
+
+	glUseProgram(shaderProgram);
+
+	int attribLoc_Position = -1;
+	attribLoc_Position = glGetAttribLocation(shaderProgram, "a_Position");
+	glEnableVertexAttribArray(attribLoc_Position);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_ParticleVBO);
+	glVertexAttribPointer(attribLoc_Position, 3, GL_FLOAT, GL_FALSE, 0, 0);		// 3개 씩 읽고, stride는 없다.
+
+	glDrawArrays(GL_TRIANGLES, 0, m_ParticleVerticesCount);	 // GL_LINE_STRIP, GL_POINTS 등도 가능하다.
 }
 
 void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)
@@ -241,20 +297,20 @@ void Renderer::GetGLPosition(float x, float y, float *newX, float *newY)
 
 void Renderer::Class0310()
 {
-	// 데이터를 준비하는 부분
+	//// 데이터를 준비하는 부분
 
-	float vertices[] = { 0,0,0, 1,0,0, 1,1,0 };	// CPU memory
-	
-	glGenBuffers(1, &m_testVBO);	// Get Buffer Object ID, 2번 생성
-	glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);	// bind tp array buffer
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);	// Data transfer to GPU
+	//float vertices[] = { 0,0,0, 1,0,0, 1,1,0 };	// CPU memory
+	//
+	//glGenBuffers(1, &m_testVBO);	// Get Buffer Object ID, 2번 생성
+	//glBindBuffer(GL_ARRAY_BUFFER, m_testVBO);	// bind tp array buffer
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);	// Data transfer to GPU
 
-	
-	float vertices1[] = { -1,-1,0, 0,-1,0, 0,0,0 };	// CPU memory
+	//
+	//float vertices1[] = { -1,-1,0, 0,-1,0, 0,0,0 };	// CPU memory
 
-	glGenBuffers(1, &m_testVBO1);	// Get Buffer Object ID, 2번 생성
-	glBindBuffer(GL_ARRAY_BUFFER, m_testVBO1);	// bind tp array buffer
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);	// Data transfer to GPU
+	//glGenBuffers(1, &m_testVBO1);	// Get Buffer Object ID, 2번 생성
+	//glBindBuffer(GL_ARRAY_BUFFER, m_testVBO1);	// bind tp array buffer
+	//glBufferData(GL_ARRAY_BUFFER, sizeof(vertices1), vertices1, GL_STATIC_DRAW);	// Data transfer to GPU
 
 
 
@@ -276,4 +332,62 @@ void Renderer::Class0310()
 	//glBufferData(GL_ARRAY_BUFFER, sizeof(float) * size, temp, GL_STATIC_DRAW);	// Data transfer to GPU
 	//std::cout << "asdf" << std::endl;
 
+}
+
+void Renderer::CreateParticle()
+{
+	float centerX, centerY;
+	centerX = 0;
+	centerY = 0;
+	float size = 0.5f;
+
+	int particleCount = 1;
+	m_ParticleVerticesCount = particleCount * 6;
+	int floatCount = m_ParticleVerticesCount * 3;	// 6 : 사각형에 필요한 버텍스 정점의 갯수는 3 * 2 = 6, 여기에 정점하나는 3개의 float으로 이루어져 있으니 * 3
+	float* vertices = NULL;
+	vertices = new float[floatCount];
+
+	int index = 0;
+	// ==========================================
+	// 첫번째 삼각형
+	// ==========================================
+	// 첫번째 버텍스
+	vertices[index++] = centerX - size;
+	vertices[index++] = centerY + size;
+	vertices[index++] = 0.f;
+
+	// 두번째 버택스
+	vertices[index++] = centerX - size;
+	vertices[index++] = centerY - size;
+	vertices[index++] = 0.f;
+
+	// 세번째 버택스
+	vertices[index++] = centerX + size;
+	vertices[index++] = centerY + size;
+	vertices[index++] = 0.f;
+
+	// ==========================================
+	// 두번째 삼각형
+	// ==========================================
+	// 첫번째 버텍스
+	vertices[index++] = centerX + size;
+	vertices[index++] = centerY + size;
+	vertices[index++] = 0.f;
+
+	// 두번째 버택스
+	vertices[index++] = centerX - size;
+	vertices[index++] = centerY - size;
+	vertices[index++] = 0.f;
+
+	// 세번째 버택스
+	vertices[index++] = centerX + size;
+	vertices[index++] = centerY - size;
+	vertices[index++] = 0.f;
+
+	
+
+	glGenBuffers(1, &m_ParticleVBO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_ParticleVBO);	// bind tp array buffer
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * floatCount, vertices, GL_STATIC_DRAW);	// Data transfer to GPU
 }

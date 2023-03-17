@@ -16,6 +16,12 @@
     <Filter Include="소스 파일\Shaders">
       <UniqueIdentifier>{aa86e47f-445f-4440-9a76-173363b46c4e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="소스 파일\Shaders\SolidRect">
+      <UniqueIdentifier>{17ecb597-9528-4188-9089-43f0c69c4ea8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="소스 파일\Shaders\Particle">
+      <UniqueIdentifier>{9a35bfaa-deb5-448c-8b46-f23fbc2a9189}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -44,10 +50,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\SolidRect.fs">
-      <Filter>소스 파일\Shaders</Filter>
+      <Filter>소스 파일\Shaders\SolidRect</Filter>
     </None>
     <None Include="Shaders\SolidRect.vs">
-      <Filter>소스 파일\Shaders</Filter>
+      <Filter>소스 파일\Shaders\SolidRect</Filter>
+    </None>
+    <None Include="Shaders\Particle.fs">
+      <Filter>소스 파일\Shaders\Particle</Filter>
+    </None>
+    <None Include="Shaders\Particle.vs">
+      <Filter>소스 파일\Shaders\Particle</Filter>
     </None>
   </ItemGroup>
 </Project>

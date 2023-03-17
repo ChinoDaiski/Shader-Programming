@@ -19,12 +19,13 @@ Renderer *g_Renderer = NULL;
 
 void RenderScene(void)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearColor(0.0f, 0.3f, 0.3f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// 색상과 깊이 버퍼를 초기화 해라.
+	glClearColor(0.5f, 0.5f, 0.5f, 1.0f);	// 초기화하는 색상은 다음과 같다.
 
 	// Renderer Test
 	//g_Renderer->DrawSolidRect(0, 0, 0, 4, 1, 0, 1, 1);
-	g_Renderer->Class0310_Render();
+	//g_Renderer->Class0310_Render();
+	g_Renderer->DrawParticleEffect();
 
 	glutSwapBuffers();
 }

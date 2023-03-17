@@ -16,6 +16,7 @@ public:
 	bool IsInitialized();
 	void DrawSolidRect(float x, float y, float z, float size, float r, float g, float b, float a);
 	void Class0310_Render();
+	void DrawParticleEffect();
 
 private:
 	void Initialize(int windowSizeX, int windowSizeY);
@@ -27,6 +28,12 @@ private:
 
 	void Class0310();
 
+	// particle VBO
+	void CreateParticle();
+	GLuint m_ParticleVBO = -1;
+	GLuint m_ParticleShader = -1;
+	GLuint m_ParticleVerticesCount = -1;	// 파티클을 그리는데 필요한 버텍스 갯수
+
 	bool m_Initialized = false;
 	
 	unsigned int m_WindowSizeX = 0;
@@ -37,5 +44,6 @@ private:
 
 	GLuint m_testVBO = 0;
 	GLuint m_testVBO1 = 0;
+	GLuint m_testVBOColor = 0;
 };
 
