@@ -6,7 +6,7 @@ Renderer::Renderer(int windowSizeX, int windowSizeY)
 	Initialize(windowSizeX, windowSizeY);
 	//Class0310();
 
-	CreateParticle();
+	CreateParticle(1000);
 }
 
 
@@ -334,56 +334,58 @@ void Renderer::Class0310()
 
 }
 
-void Renderer::CreateParticle()
+void Renderer::CreateParticle(uint32_t numParticle)
 {
 	float centerX, centerY;
-	centerX = 0;
-	centerY = 0;
-	float size = 0.5f;
+	float size = 0.01f;
 
-	int particleCount = 1;
+	int particleCount = numParticle;
 	m_ParticleVerticesCount = particleCount * 6;
 	int floatCount = m_ParticleVerticesCount * 3;	// 6 : 사각형에 필요한 버텍스 정점의 갯수는 3 * 2 = 6, 여기에 정점하나는 3개의 float으로 이루어져 있으니 * 3
 	float* vertices = NULL;
 	vertices = new float[floatCount];
 
 	int index = 0;
-	// ==========================================
-	// 첫번째 삼각형
-	// ==========================================
-	// 첫번째 버텍스
-	vertices[index++] = centerX - size;
-	vertices[index++] = centerY + size;
-	vertices[index++] = 0.f;
 
-	// 두번째 버택스
-	vertices[index++] = centerX - size;
-	vertices[index++] = centerY - size;
-	vertices[index++] = 0.f;
+	for (uint32_t i = 0; i < particleCount; ++i) {
+		centerX = ((float)rand() / (float)RAND_MAX) * 2.f - 1.f;
+		centerY = ((float)rand() / (float)RAND_MAX) * 2.f - 1.f;
+		// ==========================================
+		// 첫번째 삼각형
+		// ==========================================
+		// 첫번째 버텍스
+		vertices[index++] = centerX - size;
+		vertices[index++] = centerY + size;
+		vertices[index++] = 0.f;
 
-	// 세번째 버택스
-	vertices[index++] = centerX + size;
-	vertices[index++] = centerY + size;
-	vertices[index++] = 0.f;
+		// 두번째 버택스
+		vertices[index++] = centerX - size;
+		vertices[index++] = centerY - size;
+		vertices[index++] = 0.f;
 
-	// ==========================================
-	// 두번째 삼각형
-	// ==========================================
-	// 첫번째 버텍스
-	vertices[index++] = centerX + size;
-	vertices[index++] = centerY + size;
-	vertices[index++] = 0.f;
+		// 세번째 버택스
+		vertices[index++] = centerX + size;
+		vertices[index++] = centerY + size;
+		vertices[index++] = 0.f;
 
-	// 두번째 버택스
-	vertices[index++] = centerX - size;
-	vertices[index++] = centerY - size;
-	vertices[index++] = 0.f;
+		// ==========================================
+		// 두번째 삼각형
+		// ==========================================
+		// 첫번째 버텍스
+		vertices[index++] = centerX + size;
+		vertices[index++] = centerY + size;
+		vertices[index++] = 0.f;
 
-	// 세번째 버택스
-	vertices[index++] = centerX + size;
-	vertices[index++] = centerY - size;
-	vertices[index++] = 0.f;
+		// 두번째 버택스
+		vertices[index++] = centerX - size;
+		vertices[index++] = centerY - size;
+		vertices[index++] = 0.f;
 
+		// 세번째 버택스
+		vertices[index++] = centerX + size;
+		vertices[index++] = centerY - size;
+		vertices[index++] = 0.f;
+	}
 	
 
 	glGenBuffers(1, &m_ParticleVBO);
