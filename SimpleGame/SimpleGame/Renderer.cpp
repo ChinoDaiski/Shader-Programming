@@ -6,7 +6,7 @@ Renderer::Renderer(int windowSizeX, int windowSizeY)
 	Initialize(windowSizeX, windowSizeY);
 	//Class0310();
 
-	CreateParticle(1000);
+	CreateParticle(1);
 }
 
 
@@ -307,7 +307,7 @@ void Renderer::DrawParticleEffect()
 		glEnableVertexAttribArray(uniformLoc_Time);
 
 		glUniform1f(uniformLoc_Time, g_time);	// g_time의 값을 query_performance_time으로 사실적인 시간값을 넣어줘도 된다.
-		g_time += 0.005f;
+		g_time += 0.001f;
 
 		/*if (g_time > 10.f)
 			g_time = 0.f;*/
