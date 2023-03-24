@@ -2,17 +2,42 @@
 
 in vec3 a_Position;	// ATTRIBUTE (VS INPUT)
 in vec3 a_Vel;
+in float a_EmitTime;
+in float a_lifeTime;
 
 uniform float u_Time;
+uniform float u_Kind;
 
 const vec3 c_Gravity = vec3(0.0f, -0.8f, 0.0f);
+const float c_lifeTime = 2.0f;
 
 void main()
 {
-	vec4 newPosition;
-	newPosition.xyz = a_Position
-						+ a_Vel * u_Time
-						+ 0.5f * c_Gravity * u_Time * u_Time;
+	float time = u_Time - a_EmitTime;
+
+	vec4 newPosition = vec4(0.f, 0.f, 0.f, 1.f);
+
+	// 생성시간이 0이하라면 생성이 되지 않아야 한다.
+	if(time < 0.f)
+	{
+
+	}
+	else
+	{
+		float t = a_lifeTime * fract(time / a_lifeTime);	// fract : 0 ~ 1 사이로 값을 자르는 함수
+
+		newPosition.xyz = a_Position
+							+ a_Vel * t
+							+ 0.5f * c_Gravity * t * t;
+		/*
+		float t = c_lifeTime * fract(time / c_lifeTime);	// fract : 0 ~ 1 사이로 값을 자르는 함수
+
+		newPosition.xyz = a_Position
+							+ a_Vel * t
+							+ 0.5f * c_Gravity * t * t;
+		*/
+	}
+
 	newPosition.w = 1.f;
 	gl_Position = newPosition;
 }

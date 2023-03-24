@@ -32,6 +32,8 @@ private:
 	void CreateParticle(uint32_t numParticle);
 	GLuint m_ParticleVBO = -1;
 	GLuint m_ParticleVelVBO = -1;	// Velocity(속도)
+	GLuint m_ParticleEmitTimeVBO = -1;	// EmitTime(생성 시작 시간)
+	GLuint m_ParticleLifeTimeVBO = -1;	// LifeTime(생성 지속 시간)
 	GLuint m_ParticleShader = -1;
 	GLuint m_ParticleVerticesCount = -1;	// 파티클을 그리는데 필요한 버텍스 갯수
 
